@@ -11,7 +11,7 @@
 -- Playing around with the GHC API.
 -----------------------------------------------------------------------------
 
-module Main (main) where
+module Main (main, inspectWorld) where
 
 import DynFlags
 import GHC
@@ -21,6 +21,7 @@ import Control.Monad.IO.Class (liftIO)
 import System.IO (hFlush, stdout)
 import Control.Monad (filterM)
 import Data.List (find)
+import World
 
 main :: IO ()
 main = do
@@ -33,6 +34,7 @@ main = do
                                        }
       setContext [ preludeCtx ]
       loop
+
 
 preludeCtx :: InteractiveImport
 preludeCtx = IIDecl . simpleImportDecl $ mkModuleName "Prelude"
@@ -79,3 +81,7 @@ showDirs = liftIO $ do
   putStrLn $ "ghc_pkg: " ++ ghc_pkg
   putStrLn $ "libdir: " ++ libdir
   putStrLn $ "docdir: " ++ docdir
+ 
+inspectWorld :: IO String
+inspectWorld = foldWorld f
+  where f r e = "(id: " ++ show r ++ ", health: " ++ show (health e) ++ ") "
